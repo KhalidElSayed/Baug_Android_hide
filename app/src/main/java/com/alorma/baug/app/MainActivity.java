@@ -1,7 +1,10 @@
 package com.alorma.baug.app;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ApplicationErrorReport;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
@@ -9,6 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -41,9 +47,66 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 showResult("Result: " + result2);
                 break;
             case R.id.action3:
-                int result3 = 34 / 0;
-                showResult("Result: " + result3);
+                try {
+                    int result3 = 34 / 0;
+                    showResult("Result: " + result3);
+                } catch (ArithmeticException e) {
+                    sendError(e);
+                }
                 break;
+        }
+    }
+
+    private void sendError(Exception e) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            sendNewError(e);
+        } else {
+            sendOldError(e);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private void sendNewError(Exception e) {
+        ApplicationErrorReport report = new ApplicationErrorReport();
+        report.packageName = report.processName = getApplication().getPackageName();
+        report.time = System.currentTimeMillis();
+        report.type = ApplicationErrorReport.TYPE_CRASH;
+        report.systemApp = false;
+
+        ApplicationErrorReport.CrashInfo crash = new ApplicationErrorReport.CrashInfo();
+        crash.exceptionClassName = e.getClass().getSimpleName();
+        crash.exceptionMessage = e.getMessage();
+
+        StringWriter writer = new StringWriter();
+        PrintWriter printer = new PrintWriter(writer);
+        e.printStackTrace(printer);
+
+        crash.stackTrace = writer.toString();
+
+        StackTraceElement stack = e.getStackTrace()[0];
+        crash.throwClassName = stack.getClassName();
+        crash.throwFileName = stack.getFileName();
+        crash.throwLineNumber = stack.getLineNumber();
+        crash.throwMethodName = stack.getMethodName();
+
+        report.crashInfo = crash;
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClassName("com.google.android.feedback", "com.google.android.feedback.FeedbackActivity");
+        intent.putExtra(Intent.EXTRA_BUG_REPORT, report);
+        startActivity(intent);
+    }
+
+    private void sendOldError(Exception e) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"report@gmail.com"});
+            intent.putExtra(Intent.EXTRA_SUBJECT, getApplicationInfo().loadLabel(getApplicationContext().getPackageManager()).toString() + "(" + getPackageManager().getPackageInfo(getApplicationInfo().packageName, 0).versionName + ")" + " Contact Form | Device: " + Build.MANUFACTURER + " " + Build.DEVICE + "(" + Build.MODEL + ") API: " + Build.VERSION.SDK_INT);
+            intent.setType("plain/html");
+            startActivity(intent);
+        } catch (Exception e2) {
+
         }
     }
 
