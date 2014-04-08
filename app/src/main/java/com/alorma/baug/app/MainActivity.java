@@ -1,7 +1,11 @@
 package com.alorma.baug.app;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.UserManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +24,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.action3).setOnClickListener(this);
 
         textView = (TextView) findViewById(R.id.textView);
+
+        boolean enabled = checkRestriction(RestrictedProfilesBroadcast.KEY_BOOLEAN);
+        findViewById(R.id.action3).setEnabled(enabled);
     }
 
     @Override
@@ -39,5 +46,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void showResult(String message) {
         textView.setText(message);
+    }
+
+    private boolean checkRestriction(String restrictionKey) {
+        boolean isEnabled = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Bundle mRestrictionsBundle =
+                    ((UserManager) getSystemService(Context.USER_SERVICE))
+                            .getApplicationRestrictions(getPackageName());
+
+            if (mRestrictionsBundle != null && mRestrictionsBundle.containsKey(restrictionKey)) {
+                isEnabled = mRestrictionsBundle.getBoolean(restrictionKey);
+            }
+        }
+        return isEnabled;
     }
 }
