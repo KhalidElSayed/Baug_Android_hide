@@ -33,13 +33,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.action1:
-                showResult("Action 1");
+                int result1 = 34 / 2;
+                showResult("Result: " + result1);
                 break;
             case R.id.action2:
-                showResult("Action 2");
+                int result2 = 0 / 2;
+                showResult("Result: " + result2);
                 break;
             case R.id.action3:
-                showResult("!!!!! Action 3 !!!!!");
+                int result3 = 34 / 0;
+                showResult("Result: " + result3);
                 break;
         }
     }
