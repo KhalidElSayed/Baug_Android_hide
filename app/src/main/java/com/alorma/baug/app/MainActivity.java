@@ -98,16 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void sendOldError(Exception e) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"report@gmail.com"});
-            intent.putExtra(Intent.EXTRA_SUBJECT, getApplicationInfo().loadLabel(getApplicationContext().getPackageManager()).toString() + "(" + getPackageManager().getPackageInfo(getApplicationInfo().packageName, 0).versionName + ")" + " Contact Form | Device: " + Build.MANUFACTURER + " " + Build.DEVICE + "(" + Build.MODEL + ") API: " + Build.VERSION.SDK_INT);
-            intent.setType("plain/html");
-            startActivity(intent);
-        } catch (Exception e2) {
-
-        }
+        // DO something with exception
     }
 
     private void showResult(String message) {
