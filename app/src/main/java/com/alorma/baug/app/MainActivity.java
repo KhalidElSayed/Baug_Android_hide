@@ -10,15 +10,20 @@ import android.os.Bundle;
 import android.os.UserManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+    private static final String URL = "http://www.androidanalyse.com/wp-content/uploads/2014/02/I-Love-Android-Wallpaper.jpeg";
     private TextView textView;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +35,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.action3).setOnClickListener(this);
 
         textView = (TextView) findViewById(R.id.textView);
+        imageView = (ImageView) findViewById(R.id.imageView);
 
+        Picasso.with(this).load(URL).into(imageView);
+                
         boolean enabled = checkRestriction(RestrictedProfilesBroadcast.KEY_BOOLEAN);
         findViewById(R.id.action3).setEnabled(enabled);
     }
